@@ -150,7 +150,7 @@
                     <span id="excelFileName" class="ml-3 text-sm text-gray-500 truncate">No file chosen</span>
                 </div>
                 <button id="downloadTemplateBtn" class="mt-2 w-full text-sm text-indigo-600 hover:text-indigo-800">Download Template</button>
-                <p class="mt-1 text-xs text-gray-500">Ensure Excel columns include: page, SKU, name, size, brand, origin, price, bbd, unit (case-insensitive).</p>
+                <p class="mt-1 text-xs text-gray-500">Ensure Excel columns include: page, SKU, name, size, brand, origin, price, bbd, unit, remark (case-insensitive).</p>
             </div>
 
             <div>
@@ -276,6 +276,22 @@
                 }
             });
         }
+        
+        // **新增：自动调整备注字体大小**
+        function adjustRemarkFontSizes() {
+            const remarkElements = document.querySelectorAll('.remark-tag');
+            remarkElements.forEach(remarkElement => {
+                const container = remarkElement.parentElement; 
+                if (!container) return;
+
+                remarkElement.style.fontSize = '0.75rem'; // 12px initial size
+                let currentFontSize = 12;
+                while (remarkElement.scrollWidth > container.clientWidth * 0.9 && currentFontSize > 7) {
+                    currentFontSize--;
+                    remarkElement.style.fontSize = currentFontSize + 'px';
+                }
+            });
+        }
 
         // 格式化价格
         function formatPrice(price) {
@@ -285,7 +301,7 @@
 
         // 标准化Excel数据
         function normalizeData(data) {
-            const standardKeys = ['page', 'sku', 'name', 'size', 'brand', 'origin', 'price', 'bbd', 'unit'];
+            const standardKeys = ['page', 'sku', 'name', 'size', 'brand', 'origin', 'price', 'bbd', 'unit', 'remark'];
             return data.map(row => {
                 const newRow = {};
                 const rowKeys = Object.keys(row);
@@ -375,6 +391,10 @@
                     const originOnImageHTML = originValue && String(originValue).trim() !== ''
                         ? `<div class="absolute top-1 left-1 bg-black bg-opacity-50 text-white text-[10px] px-1.5 py-0.5 rounded">${originValue}</div>`
                         : ``;
+                    const remarkValue = product['remark'];
+                    const remarkOnImageHTML = remarkValue && String(remarkValue).trim() !== ''
+                        ? `<div class="remark-tag absolute bottom-1 left-1/2 -translate-x-1/2 bg-black bg-opacity-60 text-yellow-300 text-xs font-bold px-3 py-1 rounded whitespace-nowrap">${remarkValue}</div>`
+                        : ``;
 
                     card.innerHTML = `
                         <div class="price-tag">
@@ -395,6 +415,7 @@
                                     <img src="${imageUrl}" alt="${product['name']}" class="product-image" onerror="this.src='https://placehold.co/200x200/e2e8f0/333333?text=图片加载失败'">
                                     ${bbdOnImageHTML}
                                     ${originOnImageHTML}
+                                    ${remarkOnImageHTML}
                                 </div>
                             </div>
 
@@ -445,6 +466,7 @@
             // 渲染完成后调用字体调整函数
             adjustNameFontSizes();
             adjustPriceFontSizes();
+            adjustRemarkFontSizes();
 
             printBtn.classList.remove('hidden');
         };
@@ -641,7 +663,7 @@
 
         // 新增：下载模板功能
         downloadTemplateBtn.addEventListener('click', () => {
-            const headers = [['page', 'SKU', 'name', 'size', 'brand', 'origin', 'price', 'bbd', 'unit']];
+            const headers = [['page', 'SKU', 'name', 'size', 'brand', 'origin', 'price', 'bbd', 'unit', 'remark']];
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(headers);
             XLSX.utils.book_append_sheet(wb, ws, 'Products');
