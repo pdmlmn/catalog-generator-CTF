@@ -35,7 +35,6 @@
             position: relative;
             z-index: 10;
         }
-        /* **核心改动：使用Flexbox进行布局** */
         .page-content {
             flex-grow: 1;
             display: flex;
@@ -54,7 +53,7 @@
             flex-direction: column;
             position: relative;
             height: 330px; 
-            width: calc(33.333% - 7mm); /* **核心改动：所有卡片使用统一宽度** */
+            width: calc(33.333% - 7mm);
         }
         .product-image {
             max-width: 100%;
@@ -95,9 +94,8 @@
             font-family: 'Teko', sans-serif;
             text-transform: uppercase;
         }
-        /* 用于自动调整字体大小的容器 */
         .product-name-container {
-            height: 36px; /* 调整高度以适应更小的字体 */
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -108,17 +106,21 @@
             font-size: 0.875rem; /* 14px, 初始字体大小 */
             line-height: 1.25; 
             word-break: break-word;
-            letter-spacing: -0.5px; /* 字间距缩小 */
+            letter-spacing: -0.5px;
         }
 
-        /* 打印样式 */
+        /* **核心改动：打印样式** */
         @media print {
             body {
-                background-color: white;
+                background-color: white !important;
                 margin: 0;
             }
-            .control-panel, .print-button-container, #preview {
-                display: none;
+            .control-panel, .print-button-container {
+                display: none !important;
+            }
+            #preview {
+                padding: 0 !important;
+                overflow: visible !important;
             }
             .page {
                 margin: 0;
@@ -301,8 +303,10 @@
 
         // 标准化Excel数据
         function normalizeData(data) {
+            // **更新：过滤掉没有SKU的空行**
+            const filteredData = data.filter(row => row.SKU || row.sku);
             const standardKeys = ['page', 'sku', 'name', 'size', 'brand', 'origin', 'price', 'bbd', 'unit', 'remark'];
-            return data.map(row => {
+            return filteredData.map(row => {
                 const newRow = {};
                 const rowKeys = Object.keys(row);
                 for (const stdKey of standardKeys) {
