@@ -35,7 +35,6 @@
             position: relative;
             z-index: 10;
         }
-        /* **核心改动：使用Flexbox进行布局** */
         .page-content {
             flex-grow: 1;
             display: flex;
@@ -53,7 +52,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            /* **核心改动：尺寸由JS动态设定** */
+            width: calc(33.333% - 7mm);
         }
         .product-image {
             max-width: 100%;
@@ -157,7 +156,7 @@
                     <span id="excelFileName" class="ml-3 text-sm text-gray-500 truncate">No file chosen</span>
                 </div>
                 <button id="downloadTemplateBtn" class="mt-2 w-full text-sm text-indigo-600 hover:text-indigo-800">Download Template</button>
-                <p class="mt-1 text-xs text-gray-500">Ensure Excel columns include: page, SKU, name, size, brand, origin, price, bbd, unit, remark (case-insensitive).</p>
+                <p class="mt-1 text-xs text-gray-500">Use the 'page' column to assign products to specific pages. The tool will automatically adjust the layout for 1-9 products per page.</p>
             </div>
 
             <div>
