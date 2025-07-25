@@ -53,8 +53,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            height: 330px; 
-            width: calc(33.333% - 7mm); /* **核心改动：所有卡片使用统一宽度** */
+            /* **核心改动：尺寸由JS动态设定** */
         }
         .product-image {
             max-width: 100%;
@@ -129,6 +128,7 @@
                 box-shadow: none;
                 border: none;
                 page-break-after: always;
+                page-break-inside: avoid;
             }
             .page:last-child {
                 page-break-after: avoid;
@@ -384,9 +384,33 @@
                 const content = document.createElement('div');
                 content.className = 'page-content';
                 
+                // **更新：智能布局尺寸调整**
+                const numProducts = pageProducts.length;
+                let cardWidth = 'calc(33.333% - 7mm)';
+                let cardHeight = '330px';
+
+                if (numProducts === 1) {
+                    cardWidth = '60%';
+                    cardHeight = '500px';
+                } else if (numProducts === 2) {
+                    cardWidth = 'calc(50% - 5mm)';
+                    cardHeight = '450px';
+                } else if (numProducts === 3) {
+                    cardWidth = 'calc(33.333% - 7mm)';
+                    cardHeight = '380px';
+                } else if (numProducts === 4) {
+                    cardWidth = 'calc(50% - 5mm)';
+                    cardHeight = '400px';
+                } else if (numProducts >= 7) {
+                    cardHeight = '260px';
+                }
+
+
                 pageProducts.forEach(product => {
                     const card = document.createElement('div');
                     card.className = 'product-card';
+                    card.style.width = cardWidth;
+                    card.style.height = cardHeight;
                     
                     const imageUrl = productImages[product['sku']] || 'https://placehold.co/200x200/e2e8f0/333333?text=无图片';
                     const price = formatPrice(product['price']);
