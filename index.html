@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Automatic Catalog Generator (Excel) - Fixed Layout</title>
+    <title>Automatic Catalog Generator (Excel) - Improved</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 SheetJS 库用于解析Excel文件 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -15,12 +15,11 @@
             font-family: 'Noto Sans SC', sans-serif;
             background-color: #f0f2f5;
         }
-        
-        /* A4页面样式 - 重新设计以确保页脚不溢出 */
+        /* A4页面样式 */
         .page {
             width: 210mm;
-            height: 297mm; /* 固定高度而不是最小高度 */
-            padding: 0;
+            min-height: 297mm;
+            padding: 10mm 15mm;
             margin: 1rem auto;
             background-color: white;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
@@ -30,170 +29,102 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            overflow: hidden; /* 防止内容溢出 */
         }
-        
-        /* 页眉固定高度 */
-        .page-header {
-            height: 60px; /* 固定高度 */
+        .page-header, .page-footer {
             flex-shrink: 0;
-            padding: 10mm 15mm 5mm 15mm;
             position: relative;
             z-index: 10;
         }
-        
-        /* 页脚固定高度 */
-        .page-footer {
-            height: 80px; /* 固定高度 */
-            flex-shrink: 0;
-            padding: 5mm 15mm 10mm 15mm;
-            position: relative;
-            z-index: 10;
-        }
-        
-        /* 内容区域 - 计算剩余高度 */
         .page-content {
-            flex: 1;
-            display: grid;
-            padding: 5mm 15mm;
-            overflow: hidden; /* 防止内容溢出 */
-            align-content: start; /* 从顶部开始排列 */
+            flex-grow: 1;
+            display: flex;
+            flex-wrap: wrap;
             justify-content: center;
+            align-content: center; /* 垂直居中内容 */
+            gap: 15mm 10mm;
+            padding: 10mm 0;
         }
         
-        /* 根据产品数量动态设置网格布局 */
-        .page-content[data-product-count="1"] {
-            grid-template-columns: 1fr;
-            gap: 10mm;
-            align-content: center;
-        }
-        
-        .page-content[data-product-count="2"] {
-            grid-template-columns: 1fr 1fr;
-            gap: 8mm;
-            align-content: center;
-        }
-        
-        .page-content[data-product-count="3"] {
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6mm;
-            align-content: center;
-        }
-        
-        .page-content[data-product-count="4"] {
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 6mm;
-            align-content: center;
-        }
-        
-        .page-content[data-product-count="5"],
-        .page-content[data-product-count="6"] {
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: 1fr 1fr;
-            gap: 5mm;
-            align-content: center;
-        }
-        
-        .page-content[data-product-count="7"],
-        .page-content[data-product-count="8"],
-        .page-content[data-product-count="9"] {
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            gap: 3mm;
-            align-content: start; /* 从顶部开始，确保不溢出 */
-        }
-        
-        /* 产品卡片样式 - 根据网格自适应 */
+        /* 改进的产品卡片样式 */
         .product-card {
             border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.85); /* 半透明背景 */
             backdrop-filter: blur(2px);
             display: flex;
             flex-direction: column;
             position: relative;
-            overflow: hidden;
-            /* 移除固定高度，让网格控制 */
-            min-height: 0; /* 允许收缩 */
+            /* 添加最小高度限制 */
+            min-height: 280px;
+            /* 改进间距 */
+            margin-bottom: 10px;
+            /* 防止分页时断开 */
+            break-inside: avoid;
+            page-break-inside: avoid;
         }
         
-        /* 7-9个产品时的特殊样式 */
-        .page-content[data-product-count="7"] .product-card,
-        .page-content[data-product-count="8"] .product-card,
-        .page-content[data-product-count="9"] .product-card {
+        /* 针对不同产品数量的优化 */
+        .page-content[data-product-count="7"],
+        .page-content[data-product-count="8"],
+        .page-content[data-product-count="9"] {
+            gap: 10mm 8mm;
+        }
+        
+        /* 改进的图片样式 */
+        .product-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; /* 保持原有设置，但添加备选方案 */
+            object-position: center;
             border-radius: 4px;
+            transition: transform 0.2s ease;
         }
         
-        /* 价格标签 - 根据卡片大小调整 */
+        /* 图片加载失败时的优化样式 */
+        .product-image[src*="placehold"] {
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        /* 改进的价格标签 */
         .price-tag {
             position: absolute;
-            top: -8px;
-            right: -8px;
-            background-color: #B91C1C;
-            color: #FFD700;
+            top: -10px;
+            right: -10px;
+            background-color: #B91C1C; /* 深红色背景 */
+            color: #FFD700; /* 金黄色文字 */
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             display: flex;
-            flex-direction: column;
+            flex-direction: column; /* 垂直排列 */
             align-items: center;
             justify-content: center;
             font-weight: bold;
             line-height: 1;
             text-align: center;
-            padding: 3px;
+            padding: 5px;
             transform: rotate(15deg);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             z-index: 5;
             -webkit-print-color-adjust: exact; 
             color-adjust: exact;
             print-color-adjust: exact;
         }
         
-        /* 根据产品数量调整价格标签大小 */
-        .page-content[data-product-count="1"] .price-tag,
-        .page-content[data-product-count="2"] .price-tag {
-            width: 80px;
-            height: 80px;
-        }
-        
-        .page-content[data-product-count="3"] .price-tag,
-        .page-content[data-product-count="4"] .price-tag,
-        .page-content[data-product-count="5"] .price-tag,
-        .page-content[data-product-count="6"] .price-tag {
-            width: 70px;
-            height: 70px;
-        }
-        
-        .page-content[data-product-count="7"] .price-tag,
-        .page-content[data-product-count="8"] .price-tag,
-        .page-content[data-product-count="9"] .price-tag {
-            width: 60px;
-            height: 60px;
-            top: -6px;
-            right: -6px;
-        }
-        
         .price-number {
-            font-size: 1rem;
+            font-size: clamp(0.8rem, 2vw, 1.25rem); /* 响应式字体大小 */
             word-break: break-all;
         }
         
         .price-unit {
-            font-size: 0.7rem;
-            margin-top: 1px;
-        }
-        
-        /* 7-9个产品时的价格字体调整 */
-        .page-content[data-product-count="7"] .price-number,
-        .page-content[data-product-count="8"] .price-number,
-        .page-content[data-product-count="9"] .price-number {
-            font-size: 0.8rem;
-        }
-        
-        .page-content[data-product-count="7"] .price-unit,
-        .page-content[data-product-count="8"] .price-unit,
-        .page-content[data-product-count="9"] .price-unit {
-            font-size: 0.6rem;
+            font-size: clamp(0.6rem, 1.5vw, 0.875rem);
+            margin-top: 2px;
         }
         
         .kampanj-font {
@@ -201,151 +132,42 @@
             text-transform: uppercase;
         }
         
-        /* 品牌标题区域 */
-        .brand-header {
-            height: 20px;
-            flex-shrink: 0;
-            padding: 2px 6px;
-        }
-        
-        /* 7-9个产品时的品牌标题调整 */
-        .page-content[data-product-count="7"] .brand-header,
-        .page-content[data-product-count="8"] .brand-header,
-        .page-content[data-product-count="9"] .brand-header {
-            height: 16px;
-            padding: 1px 4px;
-        }
-        
-        /* 图片容器 */
-        .image-container {
-            flex: 1;
-            position: relative;
-            min-height: 0;
-            padding: 4px;
-        }
-        
-        .product-image {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            object-position: center;
-            border-radius: 3px;
-        }
-        
-        /* 信息容器 */
-        .info-container {
-            height: 60px;
-            flex-shrink: 0;
-            padding: 4px 6px;
-            border-top: 1px solid #e2e8f0;
+        /* 改进的产品名称容器 */
+        .product-name-container {
+            height: auto;
+            min-height: 36px;
+            max-height: 54px; /* 允许两行文本 */
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        
-        /* 7-9个产品时的信息容器调整 */
-        .page-content[data-product-count="7"] .info-container,
-        .page-content[data-product-count="8"] .info-container,
-        .page-content[data-product-count="9"] .info-container {
-            height: 50px;
-            padding: 3px 4px;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 2px 4px;
         }
         
         .product-name {
             font-weight: bold;
-            font-size: 0.75rem;
-            line-height: 1.1;
-            text-align: center;
+            font-size: 0.875rem; /* 14px, 初始字体大小 */
+            line-height: 1.2; 
             word-break: break-word;
+            letter-spacing: -0.5px;
+            text-align: center;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
         
-        /* 7-9个产品时的产品名称调整 */
-        .page-content[data-product-count="7"] .product-name,
-        .page-content[data-product-count="8"] .product-name,
-        .page-content[data-product-count="9"] .product-name {
-            font-size: 0.65rem;
-            line-height: 1;
-            -webkit-line-clamp: 1;
-        }
-        
-        .product-sku {
-            font-size: 0.65rem;
-            color: #6b7280;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .product-size {
-            font-size: 0.6rem;
-            color: #6b7280;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        /* 7-9个产品时的SKU和尺寸调整 */
-        .page-content[data-product-count="7"] .product-sku,
-        .page-content[data-product-count="8"] .product-sku,
-        .page-content[data-product-count="9"] .product-sku {
-            font-size: 0.55rem;
-        }
-        
-        .page-content[data-product-count="7"] .product-size,
-        .page-content[data-product-count="8"] .product-size,
-        .page-content[data-product-count="9"] .product-size {
-            font-size: 0.5rem;
-        }
-        
-        /* 图片上的标签 */
-        .image-overlay {
-            position: absolute;
-            font-size: 0.6rem;
-            padding: 2px 4px;
-            border-radius: 2px;
-            color: white;
-            background-color: rgba(0, 0, 0, 0.7);
-        }
-        
-        .bbd-tag {
-            bottom: 2px;
-            left: 2px;
-        }
-        
-        .origin-tag {
-            top: 2px;
-            left: 2px;
-        }
-        
+        /* 改进的备注标签 */
         .remark-tag {
-            bottom: 2px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(0, 0, 0, 0.8);
-            color: #fbbf24;
-            font-weight: bold;
-            white-space: nowrap;
             max-width: 90%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        /* 7-9个产品时的标签调整 */
-        .page-content[data-product-count="7"] .image-overlay,
-        .page-content[data-product-count="8"] .image-overlay,
-        .page-content[data-product-count="9"] .image-overlay {
-            font-size: 0.5rem;
-            padding: 1px 2px;
+            word-break: break-word;
+            hyphens: auto;
+            line-height: 1.1;
         }
 
-        /* 打印样式 */
+        /* 改进的打印样式 */
         @media print {
+            /* 确保所有颜色和背景都能打印 */
             * {
                 -webkit-print-color-adjust: exact !important;
                 color-adjust: exact !important;
@@ -373,12 +195,18 @@
                 border: none;
                 page-break-after: always;
                 page-break-inside: avoid;
-                height: 297mm !important; /* 确保打印时高度固定 */
-                overflow: hidden !important;
+                /* 确保背景图片显示 */
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
             
             .page:last-child {
                 page-break-after: avoid;
+            }
+            
+            .product-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
             }
             
             @page {
@@ -387,7 +215,7 @@
             }
         }
         
-        /* 加载状态样式 */
+        /* 添加加载状态样式 */
         .loading {
             opacity: 0.6;
             pointer-events: none;
@@ -488,7 +316,7 @@
     </div>
 
     <script>
-        // 全局错误捕获
+        // **新增：全局错误捕获**
         window.addEventListener('unhandledrejection', function(event) {
             console.error('Unhandled Rejection:', event.reason);
             statusDiv.innerHTML += `<span class="text-red-600 block">An unknown error occurred. Please check your files or refresh the page.</span>`;
@@ -526,6 +354,103 @@
             };
         }
 
+        // 改进的自动调整产品名称字体大小
+        function adjustNameFontSizes() {
+            const containers = document.querySelectorAll('.product-name-container');
+            containers.forEach(container => {
+                const nameElement = container.querySelector('.product-name');
+                if (!nameElement) return;
+                
+                // 重置样式
+                nameElement.style.fontSize = '0.875rem';
+                nameElement.style.lineHeight = '1.2';
+                
+                let currentFontSize = 14;
+                let attempts = 0;
+                const maxAttempts = 10;
+                
+                while (nameElement.scrollHeight > container.clientHeight && 
+                       currentFontSize > 8 && 
+                       attempts < maxAttempts) {
+                    currentFontSize--;
+                    nameElement.style.fontSize = currentFontSize + 'px';
+                    attempts++;
+                }
+            });
+        }
+
+        // 改进的自动调整价格字体大小
+        function adjustPriceFontSizes() {
+            const containers = document.querySelectorAll('.price-tag');
+            containers.forEach(container => {
+                const priceNumber = container.querySelector('.price-number');
+                if (!priceNumber) return;
+                
+                // 重置为初始大小
+                priceNumber.style.fontSize = '1.25rem';
+                let currentFontSize = 20;
+                let attempts = 0;
+                const maxAttempts = 8;
+                
+                // 检查宽度是否溢出
+                while (priceNumber.scrollWidth > container.clientWidth * 0.85 && 
+                       currentFontSize > 10 && 
+                       attempts < maxAttempts) {
+                    currentFontSize--;
+                    priceNumber.style.fontSize = currentFontSize + 'px';
+                    attempts++;
+                }
+            });
+        }
+        
+        // 改进的自动调整备注字体大小
+        function adjustRemarkFontSizes() {
+            const remarkElements = document.querySelectorAll('.remark-tag');
+            remarkElements.forEach(remarkElement => {
+                const container = remarkElement.parentElement; 
+                if (!container) return;
+
+                remarkElement.style.fontSize = '0.75rem'; // 12px initial size
+                let currentFontSize = 12;
+                let attempts = 0;
+                const maxAttempts = 6;
+                
+                while (remarkElement.scrollWidth > container.clientWidth * 0.85 && 
+                       currentFontSize > 8 && 
+                       attempts < maxAttempts) {
+                    currentFontSize--;
+                    remarkElement.style.fontSize = currentFontSize + 'px';
+                    attempts++;
+                }
+            });
+        }
+
+        // 添加布局验证函数
+        function validateLayout() {
+            const cards = document.querySelectorAll('.product-card');
+            let issues = [];
+            
+            cards.forEach((card, index) => {
+                const rect = card.getBoundingClientRect();
+                if (rect.height < 250) {
+                    issues.push(`Card ${index + 1}: height too small (${Math.round(rect.height)}px)`);
+                }
+                
+                const nameContainer = card.querySelector('.product-name-container');
+                const nameElement = card.querySelector('.product-name');
+                if (nameContainer && nameElement && nameElement.scrollHeight > nameContainer.clientHeight) {
+                    issues.push(`Card ${index + 1}: product name overflow`);
+                }
+            });
+            
+            if (issues.length > 0) {
+                console.warn('Layout issues detected:', issues);
+                statusDiv.innerHTML += `<span class="text-orange-600 block">Layout warnings: ${issues.length} issues detected</span>`;
+            }
+            
+            return issues.length === 0;
+        }
+
         // 格式化价格
         function formatPrice(price) {
             const num = parseFloat(price || 0);
@@ -534,6 +459,7 @@
 
         // 标准化Excel数据
         function normalizeData(data) {
+            // **更新：过滤掉没有SKU的空行**
             const filteredData = data.filter(row => (row.SKU || row.sku) && String(row.SKU || row.sku).trim() !== '');
             const standardKeys = ['page', 'sku', 'name', 'size', 'brand', 'origin', 'price', 'bbd', 'unit', 'remark'];
             return filteredData.map(row => {
@@ -547,7 +473,7 @@
             });
         }
 
-        // 核心渲染函数 - 完全重构
+        // 核心渲染函数（改进版）
         const renderPreview = () => {
             if (productData.length === 0) {
                 previewArea.innerHTML = `
@@ -563,8 +489,10 @@
                 return;
             }
 
+            // 添加加载状态
             previewArea.classList.add('loading');
             
+            // 使用 setTimeout 来允许 UI 更新
             setTimeout(() => {
                 try {
                     previewArea.innerHTML = '';
@@ -584,6 +512,7 @@
                     statusDiv.innerHTML = statusMessage;
 
                     const promoTime = promoTimeInput.value;
+                    
                     const totalPages = productData.reduce((max, p) => Math.max(max, parseInt(p.page) || 0), 0);
 
                     for (let i = 1; i <= totalPages; i++) {
@@ -594,38 +523,70 @@
                         page.className = 'page';
                         if (backgroundUrl) page.style.backgroundImage = `url(${backgroundUrl})`;
 
-                        // 页眉
                         const header = document.createElement('div');
-                        header.className = 'page-header flex justify-between items-center border-b border-gray-300';
+                        header.className = 'page-header flex justify-between items-center pb-4 border-b border-gray-300';
                         
                         const logoHTML = logoUrl 
-                            ? `<img src="${logoUrl}" alt="Company Logo" style="max-height: 50px; max-width: 200px;">`
-                            : `<div><h2 class="text-2xl font-bold text-black">CTFOOD</h2><p class="text-xs text-gray-700">Orienten nära till hands</p></div>`;
+                            ? `<img src="${logoUrl}" alt="Company Logo" style="max-height: 60px; max-width: 250px;">`
+                            : `<div><h2 class="text-3xl font-bold text-black">CTFOOD</h2><p class="text-sm text-gray-700">Orienten nära till hands</p></div>`;
 
                         header.innerHTML = `
                             ${logoHTML}
                             <div class="text-right">
-                                <h3 class="kampanj-font text-3xl text-red-600 leading-none">Kampanj</h3>
-                                <p class="text-sm font-semibold text-gray-800">${promoTime}</p>
+                                <h3 class="kampanj-font text-5xl text-red-600 leading-none">Kampanj</h3>
+                                <p class="font-semibold text-gray-800">${promoTime}</p>
                             </div>`;
 
-                        // 内容区域
                         const content = document.createElement('div');
                         content.className = 'page-content';
+                        
+                        // 添加产品数量数据属性
                         const numProducts = pageProducts.length;
                         content.setAttribute('data-product-count', numProducts);
+                        
+                        // **更新：改进的智能布局尺寸调整**
+                        let cardHeight = '330px'; // Default for 5-6 products
+
+                        if (numProducts <= 2) {
+                            cardHeight = '400px';
+                        } else if (numProducts === 3) {
+                            cardHeight = '380px';
+                        } else if (numProducts === 4) {
+                            cardHeight = '350px';
+                        } else if (numProducts >= 7) {
+                            cardHeight = Math.max(280, 400 - (numProducts - 6) * 20) + 'px';
+                        }
+                        
+                        let cardWidth = 'calc(33.333% - 7mm)';
+                        if (numProducts === 1) {
+                            cardWidth = '60%';
+                            cardHeight = '500px';
+                        } else if (numProducts === 2 || numProducts === 4) {
+                            cardWidth = 'calc(50% - 5mm)';
+                        }
 
                         pageProducts.forEach(product => {
                             const card = document.createElement('div');
                             card.className = 'product-card';
+                            card.style.width = cardWidth;
+                            card.style.height = cardHeight;
                             
                             const imageUrl = productImages[product['sku']] || 'https://placehold.co/200x200/e2e8f0/333333?text=无图片';
                             const price = formatPrice(product['price']);
                             const unit = product['unit'] || '';
                             const brand = product['brand'] || '';
                             const bbdValue = product['bbd'];
+                            const bbdOnImageHTML = bbdValue && String(bbdValue).trim() !== '' 
+                                ? `<div class="absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-[10px] px-1.5 py-0.5 rounded">BBD: ${bbdValue}</div>`
+                                : '';
                             const originValue = product['origin'];
+                            const originOnImageHTML = originValue && String(originValue).trim() !== ''
+                                ? `<div class="absolute top-1 left-1 bg-black bg-opacity-50 text-white text-[10px] px-1.5 py-0.5 rounded">${originValue}</div>`
+                                : ``;
                             const remarkValue = product['remark'];
+                            const remarkOnImageHTML = remarkValue && String(remarkValue).trim() !== ''
+                                ? `<div class="remark-tag absolute bottom-1 left-1/2 -translate-x-1/2 bg-black bg-opacity-60 text-yellow-300 text-xs font-bold px-3 py-1 rounded whitespace-nowrap">${remarkValue}</div>`
+                                : ``;
 
                             card.innerHTML = `
                                 <div class="price-tag">
@@ -633,49 +594,60 @@
                                     <div class="price-unit">${unit}</div>
                                 </div>
                                 
-                                <div class="brand-header">
+                                <!-- Brand Header -->
+                                <div class="h-[24px] flex-shrink-0 px-2 pt-0.5">
                                    ${brand ? `<h4 class="font-semibold text-xs text-left text-gray-700 truncate" title="${brand}">${brand}</h4>` : ''}
                                 </div>
                                 
-                                <div class="image-container">
-                                    <img src="${imageUrl}" alt="${product['name']}" class="product-image" onerror="this.src='https://placehold.co/200x200/e2e8f0/333333?text=图片加载失败'">
-                                    ${bbdValue && String(bbdValue).trim() !== '' ? `<div class="image-overlay bbd-tag">BBD: ${bbdValue}</div>` : ''}
-                                    ${originValue && String(originValue).trim() !== '' ? `<div class="image-overlay origin-tag">${originValue}</div>` : ''}
-                                    ${remarkValue && String(remarkValue).trim() !== '' ? `<div class="image-overlay remark-tag">${remarkValue}</div>` : ''}
-                                </div>
+                                <!-- Layout Container -->
+                                <div class="flex-grow flex flex-col border-t border-gray-200 min-h-0">
+                                    <!-- Image Container (75%) -->
+                                    <div class="relative" style="flex-basis: 75%;">
+                                        <div class="absolute inset-0 flex items-center justify-center p-2">
+                                            <img src="${imageUrl}" alt="${product['name']}" class="product-image" onerror="this.src='https://placehold.co/200x200/e2e8f0/333333?text=图片加载失败'">
+                                            ${bbdOnImageHTML}
+                                            ${originOnImageHTML}
+                                            ${remarkOnImageHTML}
+                                        </div>
+                                    </div>
 
-                                <div class="info-container">
-                                    <div class="product-sku" title="${product['sku']}">${product['sku'] || ''}</div>
-                                    <div class="product-name" title="${product['name']}">${product['name'] || ''}</div>
-                                    <div class="product-size" title="${product['size']}">${product['size'] || ''}</div>
+                                    <!-- Info Container (25%) -->
+                                    <div class="flex flex-col justify-between text-center p-2 border-t border-gray-200" style="flex-basis: 25%;">
+                                        <div class="flex-grow">
+                                            <p class="text-xs font-semibold text-gray-500 truncate" style="letter-spacing: -0.5px;" title="${product['sku']}">${product['sku'] || ''}</p>
+                                            <div class="product-name-container">
+                                                <h3 class="product-name" title="${product['name']}">${product['name'] || ''}</h3>
+                                            </div>
+                                            <p class="text-xs text-gray-600 truncate" style="letter-spacing: -0.5px;" title="${product['size']}">${product['size'] || ''}</p>
+                                        </div>
+                                    </div>
                                 </div>`;
                             content.appendChild(card);
                         });
 
-                        // 页脚
                         const footer = document.createElement('div');
-                        footer.className = 'page-footer border-t border-gray-300';
+                        footer.className = 'page-footer mt-auto pt-4 border-t border-gray-300';
                         
                         const footerTextHTML = `
-                            <div class="text-xs text-gray-600 leading-tight">
+                            <div class="text-[10px] text-gray-600 leading-relaxed">
                                 <p class="font-bold">CTFOOD STOCKHOLM: 08 581 658 80 order.sth@ctfood.se/ www.ctfood.se</p>
                                 <p class="mt-1">Med reservation för slutförsäljning och tryckfel. Priserna är angivna svenska kronor exkl. moms. Leveransvillkor fritt vårt lager. Leveranstid: 1-3 dagar. Betalningsvillkor: 15 dagar netto efter godkänd sedvanlig kreditprovning</p>
                             </div>`;
 
                         let footerMainContentHTML = footerLogoUrl
-                            ? `<div class="flex items-center h-full">
+                            ? `<div class="flex items-center">
                                    <div class="w-1/4 flex justify-center items-center pr-4">
-                                        <img src="${footerLogoUrl}" alt="Footer Logo" class="flex-shrink-0" style="width: 100%; height: auto; max-height: 50px; object-fit: contain;">
+                                        <img src="${footerLogoUrl}" alt="Footer Logo" class="flex-shrink-0" style="width: 100%; height: auto; max-height: 60px; object-fit: contain;">
                                    </div>
                                    <div class="w-3/4 text-left">
                                         ${footerTextHTML}
                                    </div>
                                </div>`
-                            : `<div class="text-center h-full flex flex-col justify-center">${footerTextHTML}</div>`;
+                            : `<div class="text-center">${footerTextHTML}</div>`;
 
                         footer.innerHTML = `
                             ${footerMainContentHTML}
-                            <p class="text-xs mt-1 text-center text-gray-400">${i} / ${totalPages}</p>`;
+                            <p class="text-xs mt-2 text-center text-gray-400">${i} / ${totalPages}</p>`;
 
                         page.appendChild(header);
                         page.appendChild(content);
@@ -683,7 +655,19 @@
                         previewArea.appendChild(page);
                     }
 
+                    // 移除加载状态
                     previewArea.classList.remove('loading');
+
+                    // 渲染完成后调用字体调整函数
+                    setTimeout(() => {
+                        adjustNameFontSizes();
+                        adjustPriceFontSizes();
+                        adjustRemarkFontSizes();
+                        
+                        // 验证布局
+                        validateLayout();
+                    }, 100);
+
                     printBtn.classList.remove('hidden');
                     
                 } catch (error) {
@@ -694,9 +678,10 @@
             }, 50);
         };
         
-        // 图片处理函数
+        // **更新：图片处理函数**
         async function handleImageUpload(file) {
-            if (file.size > 2 * 1024 * 1024) {
+            // **新增：文件大小检查**
+            if (file.size > 2 * 1024 * 1024) { // 2MB
                 statusDiv.innerHTML += `<span class="text-red-600 block">Image ${file.name} is too large (>2MB) and was skipped.</span>`;
                 return null;
             }
@@ -720,7 +705,7 @@
             }
         }
 
-        // 事件监听器
+        // 1. 处理Excel文件上传
         excelFileInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (!file) {
@@ -750,6 +735,7 @@
             reader.readAsArrayBuffer(file);
         });
 
+        // 2. 处理图片文件上传
         imageFilesInput.addEventListener('change', async (event) => {
             const files = Array.from(event.target.files);
             if (files.length === 0) {
@@ -767,7 +753,7 @@
                 try {
                     const imageUrl = await handleImageUpload(file);
                     if (imageUrl) {
-                        const fileName = file.name.split('.')[0];
+                        const fileName = file.name.split('.')[0]; // 去掉扩展名
                         productImages[fileName] = imageUrl;
                         processedCount++;
                     }
@@ -781,6 +767,7 @@
             renderPreview();
         });
 
+        // 3. 处理背景图片上传
         backgroundFileInput.addEventListener('change', async (event) => {
             const file = event.target.files[0];
             if (!file) {
@@ -800,6 +787,7 @@
             }
         });
 
+        // 4. 处理Logo上传
         logoFileInput.addEventListener('change', async (event) => {
             const file = event.target.files[0];
             if (!file) {
@@ -819,6 +807,7 @@
             }
         });
 
+        // 5. 处理Footer Logo上传
         footerLogoFileInput.addEventListener('change', async (event) => {
             const file = event.target.files[0];
             if (!file) {
@@ -838,12 +827,15 @@
             }
         });
 
+        // 6. 处理促销时间变化
         promoTimeInput.addEventListener('input', debounce(renderPreview, 300));
 
+        // 7. 打印功能
         printBtn.addEventListener('click', () => {
             window.print();
         });
 
+        // 8. 下载模板功能
         downloadTemplateBtn.addEventListener('click', () => {
             const templateData = [
                 {
@@ -871,3 +863,4 @@
     </script>
 </body>
 </html>
+
