@@ -1,71 +1,118 @@
-# 自动产品图册生成工具 (Automatic Catalog Generator)
+# Automatic Catalog Generator (Excel) - Documentation
 
-这是一个强大的、基于浏览器的产品图册自动生成工具。用户只需提供一个包含产品信息的Excel表格和对应的产品图片，即可一键生成专业、美观、可供打印的多页促销图册。
+## Overview
 
-## ✨ 主要功能 (Features)
+This is a browser-based catalog generator that creates printable product catalogs from Excel data and images. It automatically arranges products on A4-sized pages with customizable headers, footers, and backgrounds.
 
-* **实时预览**: 所有操作（上传文件、修改设置等）都会在右侧预览区实时反映，所见即所得。
-* **Excel驱动**: 完全通过Excel表格来管理产品数据，支持不区分大小写的列名自动识别。
-* **智能分页与布局**:
-    * 通过Excel中的 `page` 列，可以**手动指定**任一产品在哪一页显示。
-    * 工具会根据每一页的产品数量（支持1-9个），**自动选择**一个美观、对称的网格布局进行展示。
-* **高度可定制的外观**:
-    * **页眉Logo**: 可上传公司Logo，替换默认的文字标题。
-    * **页脚图片**: 可在页脚的说明文字旁，额外上传一个品牌Logo或图标。
-    * **背景图片**: 支持为整个图册设置自定义的背景图片。
-* **专业的产品信息展示**:
-    * **图片水印**: 可将“产地(origin)”和“最佳赏味期(bbd)”作为水印标签，叠加在产品图片的左上角和左下角。
-    * **醒目备注**: 可为特殊商品添加“备注(remark)”信息（如“新品上市”），它会以醒目的颜色和样式显示在图片底部中央。
-    * **动态字体调整**: 当产品名称或备注文字过长时，会自动缩小字体以防止溢出，确保信息的完整性。
-* **性能优化**:
-    * 所有上传的图片（产品图、Logo、背景等）都会在浏览器端**自动压缩**，大大提高了处理速度和预览的流畅性。
-    * 对上传图片的大小进行限制（2MB），并对超大文件给出明确提示。
-* **一键输出**: 支持“打印”或“另存为PDF”功能，方便您快速地将制作好的图册分发或打印。
+## Features
 
-## 🚀 如何使用 (How to Use)
+- **Excel Data Import**: Upload product information via Excel files
+- **Image Management**: Associate product images by SKU filename matching
+- **Automatic Layout**: Smart arrangement of 1-9 products per A4 page
+- **Customization Options**: 
+  - Add promotional headers with dates
+  - Upload custom logos and backgrounds
+  - Include footer information
+- **Responsive Design**: Adapts to different numbers of products per page
+- **Print-Ready Output**: Generate PDFs or print directly from browser
 
-#### 第1步: 准备您的文件
+## Usage Guide
 
-1.  **Excel 数据表**:
-    * 点击控制面板中的 **"Download Template"** 按钮，下载一个标准的Excel模板 (`product_template.xlsx`)。
-    * 根据模板中的列名，填入您的产品数据。
-2.  **产品图片**:
-    * 将所有产品图片放在一个文件夹中。
-    * 确保每一张图片的**文件名**（不含扩展名，如`.jpg`）与它在Excel表格中对应的 **`SKU`** 完全一致。例如，SKU为 `12345` 的产品，其图片应命名为 `12345.jpg`。
+### Step 1: Upload Product Data
+1. Prepare an Excel file with product information
+2. Required columns: `page`, `sku`, `name`, `size`, `brand`, `origin`, `price`, `bbd`, `unit`, `remark`
+3. Use the "page" column to specify which page each product should appear on
+4. Click "Choose File" under "Step 1" to upload your Excel file
 
-#### 第2步: 上传文件
+### Step 2: Upload Product Images
+1. Prepare images with filenames matching product SKUs (e.g., "2327.jpg" for SKU 2327)
+2. Recommended image size: 800x800 pixels
+3. Maximum file size: 2MB per image
+4. Click "Choose Files" under "Step 2" to upload your images
 
-* 在左侧的控制面板中，分别点击 **"Choose File"** (选择Excel文件) 和 **"Choose Files"** (选择产品图片)，上传您准备好的数据和图片。您可以分批次上传图片，工具会自动匹配。
+### Step 3: Customize Settings
+1. Enter a promotion date/time in the text field
+2. Optionally upload custom header logo, background image, and footer logo
+3. The system will automatically adjust layout based on number of products per page
 
-#### 第3步: 自定义您的图册
+### Generate Catalog
+1. After uploading data, the preview will automatically generate
+2. Check for any missing images or data issues in the status panel
+3. Click "Print / Save as PDF" to generate your final catalog
 
-* 在 **"Customize Settings"** 区域，输入本次促销活动的时间或主题。
-* 在 **"Customize Appearance"** 区域，您可以按需上传页眉Logo、背景图片或页脚图片，以增强品牌风格。
+## Technical Details
 
-#### 第4步: 预览与导出
+### Layout System
+- Supports 1-9 products per page with optimized layouts
+- Automatically adjusts spacing and sizing based on product count
+- Uses CSS Flexbox for responsive product arrangement
+- Implements break-inside: avoid to prevent content splitting across pages
 
-* 在您进行任何操作时，右侧的预览区都会实时更新。
-* 当您对预览效果满意后，点击 **"Print / Save as PDF"** 按钮。在弹出的打印对话框中，您可以选择直接打印，或选择“另存为PDF”来生成一个电子版文件。
+### Styling Features
+- Responsive font sizing for product names and prices
+- Price tags with rotation effect and gold text on red background
+- Product cards with semi-transparent backgrounds and blur effects
+- Support for product remarks, BBD (Best Before Date), and origin labels
 
-## 📋 Excel 数据结构说明
+### Browser Compatibility
+- Requires modern browser with JavaScript enabled
+- Uses File API, Canvas API, and modern CSS features
+- Compatible with latest versions of Chrome, Firefox, Safari, and Edge
 
-请确保您的Excel文件的第一行包含以下表头（大小写不限）：
+## File Format Specifications
 
-| 列名 (Header) | 说明 (Description)                                             | 示例 (Example)     |
-| :------------ | :------------------------------------------------------------- | :----------------- |
-| `page`        | **必需**。产品所属的页码，相同页码的产品会显示在同一页。       | `1`                |
-| `SKU`         | **必需**。产品的唯一货号，用于匹配图片文件名。                   | `2327`             |
-| `name`        | **必需**。产品名称。                                           | `Coconut Milk`     |
-| `size`        | 规格。                                                         | `6x2900ml`         |
-| `brand`       | 品牌名称。                                                     | `Aroy-D`           |
-| `origin`      | 产地。会作为水印显示在图片左上角。                             | `China`            |
-| `price`       | **必需**。价格（仅数字）。                                     | `83.90`            |
-| `bbd`         | 保质期。会作为水印显示在图片左下角。                       | `2025-12-31`       |
-| `unit`        | 价格单位。会显示在价格标签的数字下方。                         | `/dnk`             |
-| `remark`      | 备注信息。会以醒目样式显示在图片底部中央。                     | `New Arrival`      |
+### Excel Template Columns
+| Column | Description | Example |
+|--------|-------------|---------|
+| page | Page number for product placement | 1, 2, 3 |
+| sku | Product identifier | 2327 |
+| name | Product name | Coconut Milk |
+| size | Product size specification | 6x2900ml |
+| brand | Product brand | Aroy-D |
+| origin | Country of origin | Thailand |
+| price | Product price | 83.90 |
+| bbd | Best before date | 2026-12-31 |
+| unit | Price unit | st |
+| remark | Special notes | Hot Sale |
 
-## 部署 (Deployment)
+### Image Requirements
+- Format: JPG, PNG, or GIF
+- Recommended size: 800x800 pixels
+- Maximum size: 2MB
+- Filename must match SKU exactly (e.g., "2327.jpg" for SKU 2327)
 
-这是一个独立的静态 `index.html` 文件，不依赖任何后端服务。您可以直接在浏览器中打开它，或将其部署到任何支持静态网页托管的平台，例如 [GitHub Pages](https://pages.github.com/)，以方便团队成员在线使用。
+## Troubleshooting
 
----
+### Common Issues
+1. **Missing Images**: Ensure filenames exactly match SKUs (case-sensitive)
+2. **Layout Problems**: Check that Excel data is properly formatted
+3. **Performance Issues**: Reduce image sizes or number of products per page
+4. **Print Problems**: Use Chrome's Save as PDF option for best results
+
+### Error Messages
+- "Excel parsing failed": Check Excel file format and structure
+- "Image compression failed": Try reducing image file size
+- "Layout warnings": Some content may not fit properly on page
+
+## Customization Options
+
+### Header Customization
+- Upload custom company logo (recommended size: 400x100px)
+- Modify promotional text and dates
+- Add background images (recommended size: 1240x1754px)
+
+### Footer Customization
+- Add custom footer logo (recommended size: 100x100px)
+- Modify company contact information
+- Update legal text and terms
+
+## Print Settings
+
+For best print results:
+1. Use Chrome browser
+2. Select "Save as PDF" in the print dialog
+3. Set margins to "None" or "Minimum"
+4. Ensure "Background graphics" is enabled in print options
+5. Paper size: A4
+
+The system automatically generates properly sized A4 pages with 10mm margins and handles page breaks appropriately.
